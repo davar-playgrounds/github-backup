@@ -25,10 +25,12 @@ def zipdir(path, zipname):
     with zipfile.ZipFile(zipname, 'w', zipfile.ZIP_DEFLATED) as zh:
     	for root, dirs, files in os.walk(path):
             for filename in files:
-                zh.write(os.path.join(root, filename))
+                zh.write(os.path.join(root, filename),
+                    os.path.relpath(os.path.join(root, filename),
+                    os.path.join(path, '..')))
 
 def clone(repo_url, dirname):
-    code = os.system('git clone %s %s' % (repo_url, dirname))
+    code = os.system('git clone %s %s' % (repo_url, dirname.replace(' ', '\\ ')))
     if code != 0:
         raise OSError("Can't clone %s, status %d" % (repo_url, code))
 
@@ -50,7 +52,7 @@ def main():
         help="Compress downloaded repositories into .zip archive")
     parser.add_argument('-o', '--outfile', dest="outfile",
         help="Name of .zip archive to write")
-    parser.add_argument('-d', '--directory', dest="outdir",
+    parser.add_argument('-d', '--directory', dest="outdir", default=".",
         help="Name of directory to clone repositories under")
     parser.add_argument('-t', '--type', default="source",
         dest="repotype", help="Select repo type to download. Valid values are "
@@ -69,22 +71,25 @@ def main():
     while True:
         # Get next page
         response = requests.get(GITHUB_URL_FMT % (args.user, page))
-        resp = json.loads(response.content)
-
-        # If page returns empty, we're done
-        if not resp:
+        if not response.content:
             break
 
-        repolist.extend(resp)
+        loaded = response.json()
+
+        if not loaded:
+            break
+
+        repolist.extend(loaded)
         page += 1
 
-    if args.outdir:
-        dirname = args.outdir
-    else:
-        dirname = 'github_%s_%s_%s' % (args.user, args.repotype, timestamp())
+    default_dirname = 'github_%s_%s_%s' % (args.user, args.repotype, timestamp())
+
+    dirname = args.outdir
 
     if not os.path.exists(dirname):
         os.mkdir(dirname)
+    else:
+        dirname = os.path.join(dirname, default_dirname)
 
     # Clone all suitable repos   
     for repo in repolist:
