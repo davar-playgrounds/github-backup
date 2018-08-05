@@ -1,8 +1,8 @@
 Github backup utility
 ---------------------
 
-A simple pure-python script to back up repositories on a github
-account. Works on Python 2x and 3x.
+A simple pure-python script to back up all repositories on a Github org. or
+user account. Works on Python 2x and 3x.
 
 Install
 =======
@@ -25,6 +25,12 @@ Clone all repositories from the specified user account:
 ::
 
     github-backup username
+
+Clone all repositories from the specified organization:
+
+::
+
+    github-backup orgname -o
 
 Clone only source repositories
 
@@ -61,4 +67,19 @@ in specific directory (/home/erik):
 
 ::
 
-    github-backup username -d /home/erik -o archive.zip -c
+    github-backup username -d /home/erik -f archive.zip -c
+
+Authentication
+==============
+
+Enter username/password interactively (hides password on the console):
+
+::
+
+    github-backup username -a
+
+Enter username/password as command line arguments:
+
+::
+
+    github-backup username -u <username> -p <password>
