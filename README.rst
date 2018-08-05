@@ -7,13 +7,13 @@ account. Works on Python 2x and 3x.
 Install
 =======
 
-Clone this repository
+Clone this repository and run the ``install.sh`` script
 
 ::
 
     git clone https://github.com/eriknyquist/github-backup
     cd github-backup
-    sudo install.sh
+    sudo ./install.sh
 
 Usage
 =====
