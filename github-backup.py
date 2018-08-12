@@ -1,5 +1,7 @@
 #!/usr/bin/python
 
+__version__ = "0.1"
+
 import argparse
 import requests
 import datetime
@@ -98,8 +100,10 @@ def get_repos(url_fmt, name, isorg):
 def main():
     parser = argparse.ArgumentParser(description='Backs up repositories from a'
         ' Github user account')
-    parser.add_argument('name', type=str, help="Github user or org. name to "
-        "back up repositories from")
+    parser.add_argument('name', type=str, nargs='?', help="Github user or org."
+        " name to back up repositories from")
+    parser.add_argument('-v', '--version', action='store_true', dest='version',
+        help="Print version information")
     parser.add_argument('-o', '--org', action='store_true', dest='org',
         help="Indicates that the provided name is an organization name. If "
         "unset, the provided name will be treated as a username.")
@@ -120,6 +124,14 @@ def main():
         "%s." % repotypes)
 
     args = parser.parse_args()
+
+    if args.version:
+        print('github-backup %s' % __version__)
+        return
+
+    if args.name is None:
+        print('Please specify a repository or org. name')
+        return
 
     if args.repotype not in repotypes:
         raise ValueError("Invalid repo type '%s': valid values are %s"
